@@ -10,14 +10,13 @@
     <head>
     
         <%
-            ResultData data = (ResultData)request.getAttribute("DATA");
+            ResultData data = (ResultData)request.getAttribute("Data");
         %>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
     </head>
     <body>
      <%
-         out.println("あ");
          if(data != null){
          out.print("<h1>あなたの"+data.getD()+"の運勢は、"+data.getLuck()+"です！</h1>");
          }

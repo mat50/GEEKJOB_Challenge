@@ -33,7 +33,7 @@ public class ResultData implements Serializable {
         return luc;
     }
 
-    public void setLuck(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setLuck(String luc) {
+        this.luc = luc;
     }
 }
