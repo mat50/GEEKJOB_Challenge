@@ -43,61 +43,67 @@ public class FrontController extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
 
-            String actionStr = request.getParameter("action");
-            int action = Integer.parseInt(actionStr);
             HttpSession hs = request.getSession(true);
-
+            //メモ：sendRedirect=ページに直接遷移　foward＝サーブレット内で表示のみを切り替え（URLは固定）
+            //今回はfowardを使う
+            String url = "";
+            URL u = new URL();
+            //実際にデータベースにアクセスするクラス
             userAction uAct = new userAction();
             goodsAction gAct = new goodsAction();
+            //submitボタンのvalueの数字が入る
+            String actionStr = request.getParameter("action");
+            int action = Integer.parseInt(actionStr);
 
+            //ここがコントローラーの本体（どのjspがどの処理を呼んでいるのか、わかりやすい！）
             switch (action) {
                 case 1:
                     //mysqlでIDとパスワードを照合　LoginからLoginActionへ
                     String userID = request.getParameter("loginID");
                     String userPass = request.getParameter("loginPass");
+                    String LoginCheck = uAct.runCheck(userID, userPass);
 
-                    String userCheck = uAct.runCheck(userID, userPass);
-
-                    hs.setAttribute("LoginCheck", userCheck);
-
-                case 2:
-                    //ログイン及びログアウト処理
-                    String isLogin = (String) hs.getAttribute("LoginCheck");
-
-                    if ("OK!".equals(isLogin)) {
-                        response.sendRedirect("Menu.jsp");
-
+                    hs.setAttribute("LoginCheck", LoginCheck);
+                    //ログイン処理
+                    if ("OK!".equals(LoginCheck)) {
+                        url = u.run(2);
                     } else {
-                        response.sendRedirect("Login.jsp");
-                        
+                        url = u.run(1);
                     }
                     break;
-
+                case 2:
+                    //ログアウト処理
+                    hs.invalidate();
+                    url = u.run(1);
+                    break;
                 case 3:
                     //mysqlに商品データを追加　menuからGoodsInsertへ
                     String goodsName = request.getParameter("goodsName");
                     String goodsPriceStr = request.getParameter("goodsPrice");
+                    String goodsInsert = gAct.runInsert(goodsName, goodsPriceStr);
+                    //変換処理追加
+                    String gIHenkan = HENKAN.HENKANgoodsInsert(goodsInsert);
 
-                    ArrayList<String> goodsInsert = gAct.run(goodsName, goodsPriceStr);
-                    hs.setAttribute("goodsInsert", goodsInsert);
-                    out.print("帰ってきた処理の結果1*****"+goodsInsert);//うごいてる
-                    //response.sendRedirect("Menu.jsp");
-                    ArrayList gI = (ArrayList) hs.getAttribute("goodsInsert");
-                    out.print("sessionの中身1******"+gI);
+                    hs.setAttribute("goodsInsert", gIHenkan);
 
-                
+                case 4:
                     //mysqlの商品データ一覧を取得する
+                    ArrayList<String> goodsList = gAct.runList();
+                    //変換処理追加
+                    ArrayList<String> gLHenkan = HENKAN.HENKANgoodsList(goodsList);
+                    hs.setAttribute("goodsList", gLHenkan);
 
-                    hs.setAttribute("goodsList", goodsInsert);
-                    
-                    out.print("帰ってきた処理の結果2******"+goodsInsert);
-                    ArrayList gL = (ArrayList) hs.getAttribute("goodsList");
-                    out.print("sessionの中身2*******"+gL);
-                    //response.sendRedirect("Menu.jsp");
-                    
+                    url = u.run(2);
                     break;
 
             }
+            //スイッチ文で取得したURLを元に、jspに帰る
+            //以下のifはエラーページへ飛ぶ
+            if ("".equals(url) || url == null) {
+                url = u.run(999);
+            }
+            request.getRequestDispatcher(url).forward(request, response);
+
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
