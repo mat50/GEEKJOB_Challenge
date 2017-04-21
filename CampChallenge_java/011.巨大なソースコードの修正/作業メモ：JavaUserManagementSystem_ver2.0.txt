@@ -1,0 +1,107 @@
+作業メモ
+
+
+時間に関しては予想です。
+実時間の記録を失念していました…すみません。
+体感、かなり過ぎていたように思います。（特に更新・削除機能実装）
+
+
+済：DriverManager.getConnectionで指定するポート番号とパスを変更
+
+
+済：確認画面　未記入時の電話番号と種別の表示が逆
+5分
+UserDataBeans内、chkpropertiesメソッドを修正。TypeとTellの位置を、フォームを基準に並べ替えました
+
+
+済：検索　未入力時エラー　java.sql.SQLException: Parameter index out of range (1 > number of parameters, which is 0).
+30分
+また、フォームごとにbooleanの空判定を持たせ、入力されたフォームの値の数を数えるようにしました。
+
+
+済：検索　いない人物を検索した時のエラー　java.sql.SQLException: Illegal operation on empty result set.
+30分
+UserDataDTO内にboolean型の変数flagと、getter/setterを作成。検索でヒットした場合のみtrueを持つようにし、searchresult.jsp内で参照するようにしました。
+
+
+済：検索結果が一人しか出ない
+30分
+UserDataDAO内のsearchメソッドを修正。ArrayList<UserDataDTO>の形で返り値が出るようにしました。
+ArrayListは、sessionに格納して持ち回ります。
+resultdatailに進む場合は、対象のデータが配列の何番目にあるかをInteger型でsessionに格納し、合わせて持ち回ります。
+
+
+済：変更機能が実装されていない
+2時間
+Update：resultdatailに表示されたものが、 初期値として入力されるようにしました。
+
+Updateresult：
+DAOを介しての更新は、insertに合わせてvoidで戻り値がないようにし、DAOにデータを送る前の段階で内容のチェックをするようにしました。
+そのため、空フォームからの送信があった場合に、入力を促すようにしました。
+また、動作が完了した際、ArrayListとして持っているデータから対象のものを更新するようにしました。
+
+
+済：削除機能が実装されていない
+2時間
+delete：resultdatailに表示されたものを、確認として再表示するようにしました。
+
+Deleteresult：
+DAOを介しての削除は、insertに合わせてvoidで戻り値がないようにしました。
+searchresultの時点で対象のデータが存在することはわかっているため、不要と判断しました。
+また、 動作が完了した際、ArrayListとして持っているデータから対象のものを削除するようにしました。
+
+
+済：変更・削除のリザルト画面に不備がある
+15分ずつ
+各リンクを設置し、表示を適切なものにしました。
+
+
+済：delete.jspの種別表示が数字
+5分
+jh.exTypenum()メソッドを使い、文字列を取得するようにしました。
+
+
+済：詳細情報にトップへのリンクがない
+5分
+追加しました。
+
+
+済：search.javaで直リンク防止用sessionが生成されていない
+及び、以降のファイルでもアクセスチェックが行われていない
+10分
+乱数の入ったsessionを作成し、アクセスチェックを各ファイルに実装しました。
+
+
+済：UserDataDTOがJavaBeansの要件を満たしていない
+5分
+インターフェイスを実装。及びコンストラクタを実装。
+
+
+
+
+
+
+
+
+//不要コード
+
+	（resultdatail.java）
+            String udd = request.getParameter("resultData");
+            ArrayList<UserDataDTO> resultData = new ArrayList<UserDataDTO>();
+            boolean indexEnd = false;
+            int count = 0;
+            int at = 0;
+            int i;
+            String part;
+            for(i=1; i >= count; i++){
+                if(count == 0){
+            at = udd.indexOf(",");
+            part = udd.substring(0,at);
+            //resultData.add(part);
+            count++;
+            } else if(count >= 1){
+            at = udd.indexOf(",",at);
+            
+            count++;
+                }
+            }
